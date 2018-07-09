@@ -35,12 +35,10 @@ alldwg.inc: # log_unknown.pl
 	echo Creating alldwg.inc will need a few minutes...
 	-cd $(abs_top_builddir) && ./logs.sh; \
 	  mv examples/alldwg.inc examples/alldwg.inc~; \
-	  for l in *.log; do b=`basename $l .log`; \
-	    $(PERL) examples/log_unknown.pl $l >>examples/alldwg.inc; done
+	  for l in *_r*.log *_20*.log; do $(PERL) examples/log_unknown.pl "$$l" >>examples/alldwg.inc; done
 alldxf_2.inc: alldxf_1.inc
 alldxf_1.inc: alldxf_0.inc
-alldxf_0.inc: log_unknown_dxf.pl
-alldxf.inc: log_unknown_dxf.pl
+alldxf_0.inc: alldwg.inc log_unknown_dxf.pl
 	test -d ../.git || false
 	test -f alldwg.inc || (echo make regen-unknown; false)
 	-mv alldxf_0.inc alldxf_0.inc~
@@ -50,7 +48,7 @@ alldxf.inc: log_unknown_dxf.pl
 endif
 
 .PHONY: check-syntax regen-unknown dsymutil gcov
-regen-unknown: alldwg.inc alldxf.inc
+regen-unknown: alldwg.inc alldxf_0.inc
 
 if HAVE_WINE
 TESTS_ENVIRONMENT = \
